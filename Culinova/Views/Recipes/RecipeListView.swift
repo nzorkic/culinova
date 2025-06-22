@@ -15,11 +15,20 @@ struct RecipeListView: View {
     @Query(sort: \Recipe.createdAt, order: .reverse) private var recipes: [Recipe]
     
     @State private var showAddSheet = false
+    @State private var searchText = ""
+
+    /// Returns full list or subset that matches the search text (case‑insensitive)
+    private var filteredRecipes: [Recipe] {
+        guard !searchText.isEmpty else { return recipes }
+        return recipes.filter {
+            $0.title.localizedCaseInsensitiveContains(searchText)
+        }
+    }
     
     var body: some View {
         NavigationStack {
             List {
-                ForEach(recipes) { recipe in
+                ForEach(filteredRecipes) { recipe in
                     NavigationLink(value: recipe) {
                         RecipeRowView(recipe: recipe)
                             .cardStyle()
@@ -41,6 +50,7 @@ struct RecipeListView: View {
                 AddRecipeView()
                     .presentationDetents([.large])
             }
+            .searchable(text: $searchText, prompt: "Search recipes")
         }
     }
     
@@ -92,5 +102,7 @@ private struct RecipeRowView: View {
     )
     let ctx = ModelContext(previewContainer)
     ctx.insert(Recipe(title: "Preview Pancakes"))
-    return RecipeListView().modelContext(ctx)
+    return RecipeListView()
+        .searchable(text: .constant(""), prompt: "Search")
+        .modelContext(ctx)
 }
