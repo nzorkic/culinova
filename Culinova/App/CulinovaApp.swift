@@ -17,7 +17,8 @@ struct CulinovaApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RecipeListView()          // root screen (in Views/Recipes/)
+            RecipeListView()
+                .tint(Theme.accent)
         }
         // Register every root entity once.  Variadic, *not* an array.
         .modelContainer(

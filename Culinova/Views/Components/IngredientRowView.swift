@@ -29,5 +29,7 @@ struct IngredientRowView: View {
             }
             .pickerStyle(.menu)
         }
+        .padding(10)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }

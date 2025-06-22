@@ -30,7 +30,7 @@ struct IngredientEditorSection: View {
                           format: .number)
                     .frame(maxWidth: 60)
                     .keyboardType(.decimalPad)
-                Picker("Unit", selection: $draftUnit) {
+                Picker("", selection: $draftUnit) {
                     Text("—").tag(UnitOfMeasure?.none)
                     ForEach(UnitOfMeasure.allCases) { u in
                         Text(u.display).tag(Optional(u))
@@ -43,6 +43,8 @@ struct IngredientEditorSection: View {
                 } label: { Image(systemName: "plus.circle.fill") }
                 .disabled(draftName.trimmingCharacters(in: .whitespaces).isEmpty)
             }
+            .padding(10)
+            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
     }
 
@@ -52,6 +54,8 @@ struct IngredientEditorSection: View {
             Spacer()
             if !recipe.ingredients.isEmpty { EditButton().labelStyle(.iconOnly) }
         }
+        .padding(10)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private func addIngredient() {

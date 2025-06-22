@@ -1,6 +1,7 @@
 // Models/Media.swift
 import Foundation
 import SwiftData
+import UIKit
 
 enum MediaType: String, Codable, CaseIterable {
     case photo, video
@@ -9,6 +10,7 @@ enum MediaType: String, Codable, CaseIterable {
 @Model
 final class Media: Identifiable {
     @Attribute(.unique) var id: UUID
+    var image: UIImage? { ImageStorage.loadImage(at: localURL) }
     var type: MediaType
     var localURL: URL?    // sandbox file
     var remoteURL: URL?   // iCloud or CDN

@@ -30,6 +30,8 @@ struct StepEditorSection: View {
                 }
                 .disabled(draftText.trimmingCharacters(in: .whitespaces).isEmpty)
             }
+            .padding(10)
+            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
     }
 
@@ -40,6 +42,8 @@ struct StepEditorSection: View {
             Spacer()
             if !recipe.steps.isEmpty { EditButton().labelStyle(.iconOnly) }
         }
+        .padding(10)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private func addStep() {
