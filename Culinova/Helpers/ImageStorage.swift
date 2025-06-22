@@ -37,4 +37,6 @@ enum ImageStorage {
         guard let url, let data = try? Data(contentsOf: url) else { return nil }
         return UIImage(data: data)
     }
+    
+    static func pngData(of image: UIImage) -> Data? { image.pngData() }
 }

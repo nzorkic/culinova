@@ -10,14 +10,19 @@ enum MediaType: String, Codable, CaseIterable {
 @Model
 final class Media: Identifiable {
     @Attribute(.unique) var id: UUID
-    var image: UIImage? { ImageStorage.loadImage(at: localURL) }
+    var data: Data?
+    var image: UIImage? {
+        if let ui = ImageStorage.loadImage(at: localURL) { return ui }
+        if let d = data { return UIImage(data: d) }
+        return nil
+    }
     var type: MediaType
     var localURL: URL?    // sandbox file
     var remoteURL: URL?   // iCloud or CDN
     var thumbData: Data?  // omit thumbData and derive thumbnails on the fly if storage is a concern.
-
+    
     @Relationship(inverse: \Recipe.media) var recipe: Recipe?
-
+    
     init(type: MediaType) {
         id = UUID()
         self.type = type

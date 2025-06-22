@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 import SwiftData
 
 /// Transient ingredient draft (keeps AddRecipeView decoupled from SwiftData until Save)
@@ -24,6 +25,9 @@ struct AddRecipeView: View {
     @State private var title = ""
     @State private var notes = ""
     
+    @State private var photoSelection: PhotosPickerItem?
+    @State private var pickedImage:   UIImage?      // live preview
+    
     @State private var ingredients: [IngredientDraft] = []
     @State private var steps: [String] = []
     
@@ -32,6 +36,38 @@ struct AddRecipeView: View {
     
     var body: some View {
         NavigationStack {
+            // ── Photo header ────────────────────────────────────────────────
+            PhotosPicker(selection: $photoSelection,
+                         matching: .images,
+                         photoLibrary: .shared()) {
+                ZStack {
+                    if let img = pickedImage {
+                        Image(uiImage: img)
+                            .resizable()
+                            .scaledToFill()
+                    } else {
+                        Theme.sky
+                        Label("Add Photo", systemImage: "photo")
+                            .font(.title3).bold()
+                            .foregroundStyle(.white)
+                    }
+                }
+                .frame(height: 220)
+                .clipped()
+            }
+                         .buttonStyle(.plain)        // no blue overlay
+                         .padding(.bottom, 4)        // small gap before the form
+                         .onChange(of: photoSelection) { _, item in
+                             Task {
+                                 guard
+                                    let data = try? await item?.loadTransferable(type: Data.self),
+                                    let uiImage = UIImage(data: data)
+                                 else { return }
+                                 
+                                 pickedImage = uiImage     // live preview
+                             }
+                         }
+            // ────────────────────────────────────────────────────────────────
             Form {
                 // ----- Basic meta -----
                 Section("Title") {
@@ -123,6 +159,19 @@ struct AddRecipeView: View {
             recipe.steps.append(Step(order: idx + 1, text: txt))
         }
         
+        // Attach hero photo if one was picked
+        if let uiImage = pickedImage,
+           let url     = try? ImageStorage.save(uiImage) {
+            
+            let thumb = ImageStorage.thumbnailData(from: uiImage)
+            let fullData = ImageStorage.pngData(of: uiImage)
+            let media = Media(type: .photo)
+            media.localURL  = url
+            media.thumbData = thumb
+            media.data = fullData
+            recipe.media.append(media)
+        }
+        
         withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
             context.insert(recipe)
         }
@@ -140,7 +189,7 @@ private struct IngredientDraftRow: View {
             TextField("Name", text: $draft.name)
             Spacer(minLength: 4)
             TextField("Qty",
-                      value: $draft.qty,
+                      value: Binding($draft.qty, 0),
                       format: .number)
             .frame(maxWidth: 60)
             .keyboardType(.decimalPad)
