@@ -15,6 +15,10 @@ struct RecipeDetailView: View {
     
     @State private var photoSelection: PhotosPickerItem?
     
+    @State private var draftTag = ""
+    
+    private let tagColumns = [GridItem(.adaptive(minimum: 80), spacing: 8)]
+    
     var body: some View {
         VStack(spacing: 0) {                               // single root view
             header
@@ -61,9 +65,43 @@ struct RecipeDetailView: View {
                 TextEditor(text: Binding($recipe.notes))
                     .frame(minHeight: 120)
             }
+            Section("Tags") {
+                LazyVGrid(columns: tagColumns, alignment: .leading, spacing: 8) {
+                    ForEach(recipe.tags) { tag in
+                        HStack(spacing: 4) {
+                            TagChip(text: tag.label)
+                            Button(action: {
+                                recipe.tags.removeAll { $0.id == tag.id }
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.system(size: 12))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+
+                // quick add
+                HStack {
+                    TextField("New tag", text: $draftTag)
+                        .textInputAutocapitalization(.never)
+                    Button("Add") {
+                        addTag()
+                    }
+                    .disabled(draftTag.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+            }
             IngredientEditorSection(recipe: recipe)
             StepEditorSection(recipe: recipe)
         }
+    }
+    
+    private func addTag() {
+        let clean = draftTag.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !clean.isEmpty,
+              !recipe.tags.contains(where: { $0.label == clean }) else { return }
+        recipe.tags.append(Tag(label: clean))
+        draftTag = ""
     }
     
     // MARK: - Photo handler

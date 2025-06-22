@@ -25,6 +25,9 @@ struct AddRecipeView: View {
     @State private var title = ""
     @State private var notes = ""
     
+    @State private var draftTag  = ""
+    @State private var tagStrings: [String] = []
+    
     @State private var photoSelection: PhotosPickerItem?
     @State private var pickedImage:   UIImage?      // live preview
     
@@ -33,6 +36,8 @@ struct AddRecipeView: View {
     
     @State private var draftIng = IngredientDraft()   // footer row
     @State private var draftStep = ""
+    
+    private let tagColumns = [GridItem(.adaptive(minimum: 80), spacing: 8)]
     
     var body: some View {
         NavigationStack {
@@ -77,6 +82,34 @@ struct AddRecipeView: View {
                 Section("Notes") {
                     TextEditor(text: $notes)
                         .frame(minHeight: 120)
+                }
+                
+                // ----- Tags -----
+                Section("Tags") {
+                    LazyVGrid(columns: tagColumns, alignment: .leading, spacing: 8) {
+                        ForEach(tagStrings, id: \.self) { tag in
+                            HStack(spacing: 4) {
+                                TagChip(text: tag)
+                                Button(action: { tagStrings.removeAll { $0 == tag } }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .font(.system(size: 12))
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+
+                    // Add-new footer
+                    HStack {
+                        TextField("New tag", text: $draftTag)
+                            .textInputAutocapitalization(.never)
+                        Button("Add") {
+                            let clean = draftTag.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                            guard !clean.isEmpty, !tagStrings.contains(clean) else { return }
+                            tagStrings.append(clean)
+                            draftTag = ""
+                        }
+                    }
                 }
                 
                 // ----- Ingredients -----
@@ -171,6 +204,9 @@ struct AddRecipeView: View {
             media.data = fullData
             recipe.media.append(media)
         }
+        
+        // Tags
+        recipe.tags = tagStrings.map { Tag(label: $0) }
         
         withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
             context.insert(recipe)

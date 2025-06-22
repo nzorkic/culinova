@@ -11,18 +11,34 @@ import SwiftData
 struct RecipeListView: View {
     @Namespace private var heroNS
     @Namespace private var recipeNS
+    
     @Environment(\.modelContext) private var context
+    
     @Query(sort: \Recipe.createdAt, order: .reverse) private var recipes: [Recipe]
+    @Query private var allTags: [Tag]
     
     @State private var showAddSheet = false
     @State private var searchText = ""
-
-    /// Returns full list or subset that matches the search text (case‑insensitive)
+    @State private var activeTag: Tag?    // single-tag filter
+    
     private var filteredRecipes: [Recipe] {
-        guard !searchText.isEmpty else { return recipes }
-        return recipes.filter {
-            $0.title.localizedCaseInsensitiveContains(searchText)
+        var set = recipes
+        if let tag = activeTag {
+            set = set.filter { $0.tags.contains(where: { $0.label == tag.label }) }
         }
+        if !searchText.isEmpty {
+            set = set.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
+        }
+        return set
+    }
+    
+    /// Unique tags pulled from the current recipe set
+    private var usedTags: [Tag] {
+        var dict: [String: Tag] = [:]
+        recipes.flatMap(\.tags).forEach { tag in
+            if dict[tag.label] == nil { dict[tag.label] = tag }
+        }
+        return dict.values.sorted { $0.label < $1.label }
     }
     
     var body: some View {
@@ -45,6 +61,16 @@ struct RecipeListView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showAddSheet = true }) { Image(systemName: "plus") }
                 }
+                ToolbarItem {
+                    Menu {
+                        Button("All Recipes") { activeTag = nil }
+                        ForEach(usedTags.sorted(by: { $0.label < $1.label })) { tag in
+                            Button(tag.label.capitalized) { activeTag = tag }
+                        }
+                    } label: {
+                        Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
+                    }
+                }
             }
             .sheet(isPresented: $showAddSheet) {
                 AddRecipeView()
@@ -66,7 +92,7 @@ private struct RecipeRowView: View {
     
     var body: some View {
         let thumb = recipe.media.first(where: { $0.type == .photo })?.thumbData
-
+        
         HStack {
             if let data = thumb, let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
@@ -79,6 +105,15 @@ private struct RecipeRowView: View {
                 Text(recipe.title.isEmpty ? "Untitled" : recipe.title)
                     .font(.headline)
                     .foregroundStyle(Theme.navy)
+                
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 60), spacing: 4)],
+                          alignment: .leading,
+                          spacing: 4) {
+                    ForEach(recipe.tags.prefix(3)) { tag in
+                        TagChip(text: tag.label)
+                    }
+                }
+                          .font(.caption)
                 
                 // Optional subtitle
                 if let firstIng = recipe.ingredients.first?.name {
