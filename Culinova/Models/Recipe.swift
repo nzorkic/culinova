@@ -20,8 +20,8 @@ final class Recipe: Identifiable {
     var tags: [Tag] = []
     var media: [Media] = []
 
-    // Owner (optional until sign-in arrives)
-    var author: User?
+    @Relationship(inverse: \User.recipes)
+    var owner: User? // keep optional for migration safety
 
     init(title: String) {
         self.id = UUID()

@@ -5,6 +5,8 @@ import SwiftData
 final class User: Identifiable {
     @Attribute(.unique) var id: UUID
     @Attribute(.unique) var username: String
+    @Attribute(.unique) var firebaseUID: String?
+    
     var displayName: String?
     var avatarURL: URL?
 

@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AE932C7F2E08A99F001B6FCE /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = AE932C7E2E08A99F001B6FCE /* FirebaseAuth */; };
+		AE932C812E08AA08001B6FCE /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = AE932C802E08AA08001B6FCE /* FirebaseAnalytics */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		AE932C112E0825F3001B6FCE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +57,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AE932C812E08AA08001B6FCE /* FirebaseAnalytics in Frameworks */,
+				AE932C7F2E08A99F001B6FCE /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +119,8 @@
 			);
 			name = Culinova;
 			packageProductDependencies = (
+				AE932C7E2E08A99F001B6FCE /* FirebaseAuth */,
+				AE932C802E08AA08001B6FCE /* FirebaseAnalytics */,
 			);
 			productName = Culinova;
 			productReference = AE932C032E0825F2001B6FCE /* Culinova.app */;
@@ -195,6 +204,9 @@
 			);
 			mainGroup = AE932BFA2E0825F2001B6FCE;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AE932C7D2E08A99F001B6FCE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AE932C042E0825F2001B6FCE /* Products */;
 			projectDirPath = "";
@@ -397,6 +409,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Culinova;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your photos so you can add pictures of your recipes.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -425,6 +439,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Culinova;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "We need access to your photos so you can add pictures of your recipes.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -552,6 +568,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AE932C7D2E08A99F001B6FCE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.14.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AE932C7E2E08A99F001B6FCE /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AE932C7D2E08A99F001B6FCE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		AE932C802E08AA08001B6FCE /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AE932C7D2E08A99F001B6FCE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = AE932BFB2E0825F2001B6FCE /* Project object */;
 }

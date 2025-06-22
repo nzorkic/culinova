@@ -11,28 +11,41 @@
 
 import SwiftUI
 import SwiftData
+import FirebaseCore
 
 @main
 struct CulinovaApp: App {
-
+    private let container: ModelContainer
+    private let modelContext: ModelContext
+    @StateObject private var auth: AuthService
+    
+    init() {
+        FirebaseApp.configure()
+        // 1. Build container once
+        container = try! ModelContainer(
+            for: Recipe.self, Ingredient.self, Step.self, Tag.self,
+            Media.self, User.self, Follow.self, AuthCredential.self
+        )
+        // 2. Create context
+        modelContext = ModelContext(container)
+        
+        // 3. Hand context to AuthService
+        AuthService.setContext(modelContext)
+        _auth = StateObject(wrappedValue: AuthService.shared)
+    }
+    
     var body: some Scene {
         WindowGroup {
-            RecipeListView()
-                .tint(Theme.accent)
+            if auth.user != nil {         // ← this now updates live
+                RecipeListView()
+                    .environmentObject(auth)       // handy if children need it
+                    .tint(Theme.accent)
+            } else {
+                LoginView()
+                    .environmentObject(auth)
+            }
         }
-        // Register every root entity once.  Variadic, *not* an array.
-        .modelContainer(
-            for: [
-                Recipe.self,
-                Ingredient.self,
-                Step.self,
-                Tag.self,
-                Media.self,
-                User.self,
-                Follow.self,
-                AuthCredential.self
-            ]
-        )
+        .modelContainer(container)
     }
 }
 
@@ -43,16 +56,16 @@ struct CulinovaApp: App {
     let previewContainer: ModelContainer = {
         let container = try! ModelContainer(
             for: Recipe.self,
-                 Ingredient.self,
-                 Step.self,
-                 Tag.self,
+            Ingredient.self,
+            Step.self,
+            Tag.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         let ctx = ModelContext(container)
         ctx.insert(Recipe(title: "Preview Pancakes"))
         return container
     }()
-
+    
     NavigationStack {
         RecipeListView()
     }

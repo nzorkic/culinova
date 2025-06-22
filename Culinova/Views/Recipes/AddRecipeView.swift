@@ -208,10 +208,26 @@ struct AddRecipeView: View {
         // Tags
         recipe.tags = tagStrings.map { Tag(label: $0) }
         
+        if let uid = AuthService.shared.currentUser?.firebaseUID {
+            let owner: User
+            if let existing = try? context.fetch(
+                FetchDescriptor<User>(predicate: #Predicate { $0.firebaseUID == uid })
+            ).first {
+                owner = existing                      // already in this context
+            } else {
+                // create + insert in the SAME context
+                owner = User(username: uid.lowercased())
+                owner.firebaseUID = uid
+                owner.displayName = AuthService.shared.currentUser?.displayName
+                context.insert(owner)
+            }
+            recipe.owner = owner                      // now both share one context
+        }
+        
         withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
             context.insert(recipe)
         }
-        
+        try? context.save()                           // flush, then dismiss
         dismiss()
     }
 }
